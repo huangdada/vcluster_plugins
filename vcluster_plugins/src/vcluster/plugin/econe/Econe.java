@@ -1,4 +1,4 @@
-package vcluster.plugin.cloud;
+package vcluster.plugin.econe;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+
 import vcluster.plugman.CloudInterface;
 
 import com.sun.xml.bind.StringInputStream;
@@ -117,7 +118,43 @@ public class Econe implements CloudInterface{
 	}
 
 	@Override
-	public boolean createVM() {
+	public boolean createVM(int maxCount) {
+		
+		System.out.println("Under devoleping.......");
+		QueryInfo qi = new QueryInfo();
+		
+		qi.putValue("Action", Command.RUN_INSTANCE.getCommand());
+		qi.putValue("ImageId", cloud.getImageName());
+
+		String timestamp = Util.getTimestampFromLocalTime(Calendar.getInstance().getTime());
+
+		/* fill the default values */
+		qi.putValue("MinCount", "1");
+		qi.putValue("MaxCount", Integer.toString(maxCount));
+		qi.putValue("InstanceType", cloud.getInstaceType());
+
+		/* fill the default values */
+        qi.putValue("Timestamp", timestamp);
+		qi.putValue("Version", cloud.getVersion());
+		
+		if (cloud.getKeyName() != null) 
+			qi.putValue("KeyName", cloud.getKeyName());
+		
+		
+		qi.putValue("SignatureVersion", cloud.getSignatureVersion());
+		qi.putValue("SignatureMethod", cloud.getSignatureMethod());
+		
+
+		String query = null;
+		try {
+			query = makeGETQuery(cloud, qi);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+    	executeQuery(Command.RUN_INSTANCE, cloud.getEndPoint(), query);
+    	
+    	return true;
 		// TODO Auto-generated method stub
 		/*Thread t = new Thread() {
 			public void run() {
@@ -128,8 +165,6 @@ public class Econe implements CloudInterface{
 		};
 		t.start();
 */
-		System.out.println("Under devoleping.......");
-		return true;
 	}
 
 	@Override
@@ -166,7 +201,7 @@ public class Econe implements CloudInterface{
     	executeQuery(Command.DESCRIBE_INSTANCE,cloud.getEndPoint(), query);
 
 		
-    	
+    	System.out.println(query);
     	return true;
 	}
 

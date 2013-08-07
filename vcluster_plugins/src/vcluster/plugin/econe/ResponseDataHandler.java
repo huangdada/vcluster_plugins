@@ -1,4 +1,4 @@
-package vcluster.plugin.cloud;
+package vcluster.plugin.econe;
 
 import java.io.FileWriter;
 import java.io.IOException;

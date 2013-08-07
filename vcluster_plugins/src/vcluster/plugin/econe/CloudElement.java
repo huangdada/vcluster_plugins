@@ -1,10 +1,10 @@
-package vcluster.plugin.cloud;
+package vcluster.plugin.econe;
 
 import java.util.List;
 import java.util.StringTokenizer;
 
-import vcluster.plugin.cloud.Config.CloudType;
-import vcluster.plugin.cloud.PrintMsg.DMsgType;
+import vcluster.plugin.econe.Config.CloudType;
+import vcluster.plugin.econe.PrintMsg.DMsgType;
 
 public class CloudElement {
 	

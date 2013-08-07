@@ -1,4 +1,4 @@
-package vcluster.plugin.cloud;
+package vcluster.plugin.econe;
 
 import java.util.HashMap;
 import java.util.Map;

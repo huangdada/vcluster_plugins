@@ -1,4 +1,4 @@
-package vcluster.plugin.cloud;
+package vcluster.plugin.econe;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import vcluster.plugin.cloud.PrintMsg.DMsgType;
+import vcluster.plugin.econe.PrintMsg.DMsgType;
 
 public class Util {
 
