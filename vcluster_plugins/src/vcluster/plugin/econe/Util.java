@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import vcluster.global.Config;
 import vcluster.plugin.econe.PrintMsg.DMsgType;
 
 public class Util {
@@ -48,10 +49,6 @@ public class Util {
 
 		String aValue = st.nextToken().trim();
 
-		if (aKey.equalsIgnoreCase("condor"))
-			Config.CONDOR_IPADDR = aValue;
-		else if (aKey.equalsIgnoreCase("one"))
-			Config.ONE_IPADDR = aValue;
 	}
 	
 

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import vcluster.global.Config;
 import vcluster.plugman.BatchInterface;
 
 public class HTCondor implements BatchInterface{
@@ -23,8 +24,9 @@ public class HTCondor implements BatchInterface{
         String cmdLine = "condor_status";
 
         try {
+        	//System.out.println(Config.CONDOR_IPADDR);
         	socket = new Socket(Config.CONDOR_IPADDR, Config.PORTNUM);
-        	
+        	//System.out.println(Config.CONDOR_IPADDR);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new DataOutputStream(socket.getOutputStream());
             out.flush();
@@ -305,12 +307,6 @@ public class HTCondor implements BatchInterface{
 	}
 
 
-
-	@Override
-	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public boolean ConnectTo(File conf) {

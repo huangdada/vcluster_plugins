@@ -34,6 +34,42 @@ public class QStatus {
 			return false;
 		}
 
+		/* get completed jobs */
+		token = st.nextToken();
+
+		numJob = Integer.parseInt(token);
+
+		if (!st.hasMoreTokens()) return false;
+		if (!st.nextToken().equalsIgnoreCase("completed")) {
+    		System.out.println("ERROR: token, completed, expected, but not");
+			return false;
+		}
+		completedJob = numJob;
+
+
+		
+		if (!st.hasMoreTokens()) {
+    		System.out.println("ERROR: no more token");
+			return false;
+		}
+		
+		/* get removed jobs */
+		token = st.nextToken();
+
+		numJob = Integer.parseInt(token);
+
+		if (!st.hasMoreTokens()) return false;
+		if (!st.nextToken().equalsIgnoreCase("removed")) {
+    		System.out.println("ERROR: token, removed, expected, but not");
+			return false;
+		}
+		removedJob = numJob;
+		
+		if (!st.hasMoreTokens()) {
+    		System.out.println("ERROR: no more token");
+			return false;
+		}
+		
 		/* get idle jobs */
 		token = st.nextToken();
 
@@ -45,8 +81,6 @@ public class QStatus {
 			return false;
 		}
 		idleJob = numJob;
-
-
 		
 		if (!st.hasMoreTokens()) {
     		System.out.println("ERROR: no more token");
@@ -63,6 +97,11 @@ public class QStatus {
 			return false;
 		}
 		runningJob = numJob;
+		
+		if (!st.hasMoreTokens()) {
+    		System.out.println("ERROR: no more token");
+			return false;
+		}
 
 		/* get held jobs */
 		token = st.nextToken();
@@ -75,6 +114,21 @@ public class QStatus {
 		}
 		heldJob = numJob;
 		
+		if (!st.hasMoreTokens()) {
+    		System.out.println("ERROR: no more token");
+			return false;
+		}
+		
+		/* get suspended jobs */
+		token = st.nextToken();
+		numJob = Integer.parseInt(token);
+
+		if (!st.hasMoreTokens()) return false;
+		if (!st.nextToken().equalsIgnoreCase("suspended")) {
+    		System.out.println("ERROR: token, held, expected, but not");
+			return false;
+		}
+		suspendedJob = numJob;
 		
 		/* check the number of jobs */
 		numJob = idleJob + runningJob + heldJob;
@@ -120,16 +174,22 @@ public class QStatus {
 		System.out.println("----------------------------------------");
 		System.out.println(" Total Jobs : " + getTotalJob());
 		System.out.println();
+		System.out.println("  Completed : " + completedJob);
+		System.out.println("    Removed : " + removedJob);
 		System.out.println("       Idle : " + getIdleJob());
 		System.out.println("    Running : " + getRunningJob());
 		System.out.println("       Held : " + getHeldJob());
+		System.out.println("  Suspended : " + suspendedJob);
 		System.out.println("----------------------------------------");
 	}
 	
 	
 	private static int totalJob = 0;
+	private static int completedJob = 0;
+	private static int removedJob = 0;
 	private static int idleJob = 0;
 	private static int runningJob = 0;
 	private static int heldJob = 0;
+	private static int suspendedJob = 0;
 	
 }

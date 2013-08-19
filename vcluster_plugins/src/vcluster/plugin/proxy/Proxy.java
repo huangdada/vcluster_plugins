@@ -6,8 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import vcluster.control.VMelement;
+import vcluster.global.Config.VMState;
 import vcluster.plugman.CloudInterface;
 
 public class Proxy implements CloudInterface {
@@ -15,6 +19,7 @@ public class Proxy implements CloudInterface {
 	public static void main(String[] arg){
 	    String cmdLine = "";
 	    Proxy proxy = new Proxy();
+	    proxy.RegisterCloud(new ArrayList<String>());
 	    /* prompt */
 	   do{
 		    System.out.print("vcluter > ");
@@ -29,6 +34,8 @@ public class Proxy implements CloudInterface {
 		    catch(Exception e){e.printStackTrace();}	
 		    
 		    String[] cmds = cmdLine.split(" ");
+			//proxy.socketToproxy(cmdLine);
+		   
 			if(cmds[1].equalsIgnoreCase("list")){
 				proxy.listVMs();
 			}else if(cmds[1].equalsIgnoreCase("create")){
@@ -36,8 +43,13 @@ public class Proxy implements CloudInterface {
 				proxy.createVM(nums);
 			}else if(cmds[1].equalsIgnoreCase("destroy")){
 						proxy.destroyVM(cmds[2]);
+			}else if(cmds[1].equalsIgnoreCase("suspend")){
+				proxy.suspendVM(cmds[2]);
+			}
+			else if(cmds[1].equalsIgnoreCase("start")){
+				proxy.startVM(cmds[2]);
 			}else{
-				proxy.socketToproxy(cmdLine);
+					proxy.socketToproxy(cmdLine);
 			}
 	   }while(!cmdLine.equals("quit"));
 	}
@@ -53,12 +65,13 @@ public class Proxy implements CloudInterface {
 		}
 	}
 	
-	private boolean socketToproxy(String cmd){
+	private ArrayList<String> socketToproxy(String cmd){
 		String cmdLine=cmd;
+		ArrayList<String> feedBack = new ArrayList<String>();
 		 Socket socket = null;
 	        BufferedReader in = null;
 	        DataOutputStream out = null;
-
+	        //System.out.println(cmdLine);
 	        try {
 	        	socket = new Socket(addr, port);
 	        	
@@ -79,83 +92,187 @@ public class Proxy implements CloudInterface {
 	            
 	            char[] cbuf = new char[1024];
 	        	String temp = null;
-
 	        	while (in.read(cbuf, 0, 1024) != -1) {
 	            	String str = new String(cbuf);
-	    	        str = str.trim();
+	    	        str = str.trim();	    	        
+	    	        if (!str.equals(temp)){
+	    	        	//System.out.println(str);
+	    	        	 feedBack.add(str);
+	    	        }
 	    	        
-	    	        if (!str.equals(temp))
-	    	        	System.out.println(str);
-	            	cbuf[0] = '\0';
+	    	        cbuf[0] = '\0';
 	            	temp = str;
 	            }
 	            
 	        } catch (UnknownHostException e) {
 	    		System.out.print("ERROR: " +e.getMessage());
 	            closeStream(in, out, socket);
+	            return feedBack;
 	        } catch (IOException e) {
 	    		System.out.print("ERROR: " +e.getMessage());
 	            closeStream(in, out, socket);
+	            return feedBack;
 	        }
 	        
 	        closeStream(in, out, socket);
-	        return true;
+	        return feedBack;
 	}
 	
 	
 	@Override
 	public boolean RegisterCloud(List<String> configurations) {
 		// TODO Auto-generated method stub
-		return false;
+		//configurations.add("username=amol");
+		//configurations.add("endpoint=fcl301.fnal.gov");
+		//configurations.add("port=9734");
+		//configurations.add("template = OpenNebula/clean.one");
+		for(String aLine : configurations){
+			
+			StringTokenizer st = new StringTokenizer(aLine, "=");
+			
+			if (!st.hasMoreTokens()) return false;
+			
+			/* get a keyword */
+			String aKey = st.nextToken().trim();
+		
+			/* get a value */
+			if (!st.hasMoreTokens()) return false;
+
+			String aValue = st.nextToken().trim();
+			
+			if (aKey.equalsIgnoreCase("username"))
+				this.username = aValue;
+			else if (aKey.equalsIgnoreCase("endpoint"))
+				this.addr = aValue;
+			else if (aKey.equalsIgnoreCase("port"))
+				this.port = Integer.parseInt(aValue);
+			else if (aKey.equalsIgnoreCase("template")){
+				this.template = aValue;
+			}
+			
+		}
+		return true;
 	}
 
 	@Override
-	public boolean createVM(int maxCount) {
+	public ArrayList<VMelement> createVM(int maxCount) {
 		// TODO Auto-generated method stub
-		String cmdLine="onevm create OpenNebula/vcluster.one -m "+ maxCount;		
-			return this.socketToproxy(cmdLine);
+		String cmdLine="onevm create "+template +" -m "+maxCount;	
+		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<String> feedBack = socketToproxy(cmdLine);
+		if(feedBack!=null&&!feedBack.isEmpty()&&feedBack.get(0).contains("ID:")){
+			for(int i = 0;i<feedBack.size();i++){
+				
+				String [] vmEle = feedBack.get(i).split("\\s+");
+				VMelement vm = new VMelement();
+				vm.setId(vmEle[1]);
+				vm.setState(VMState.PROLOG);
+				vmList.add(vm);				
+			}
+		}else{
+			System.out.println(feedBack.get(0));
+			return null;
+		}
+			return vmList;
 	}
 
 	@Override
-	public boolean listVMs() {
+	public ArrayList<VMelement> listVMs() {
 		// TODO Auto-generated method stub
-		String cmdLine="onevm list";
-		 		
-			return this.socketToproxy(cmdLine);
+		String cmdLine="onevm list "+username;
+		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<String> feedBack = socketToproxy(cmdLine);
+		if(feedBack!=null&&!feedBack.isEmpty()&&feedBack.get(0).contains("ID")){
+			for(int i = 1;i<feedBack.size();i++){
+				
+				String [] vmEle = feedBack.get(i).split("\\s+");
+				VMelement vm = new VMelement();
+				vm.setId(vmEle[0]);
+				//vm.setState(vmEle[4]);
+				if(vmEle[4].equalsIgnoreCase("runn")){
+					vm.setState(VMState.RUNNING);
+				}else if(vmEle[4].equalsIgnoreCase("stop")){
+					vm.setState(VMState.STOP);
+				}else if(vmEle[4].equalsIgnoreCase("Pend")){
+					vm.setState(VMState.PENDING);
+				}else if(vmEle[4].equalsIgnoreCase("Prol")){
+					vm.setState(VMState.PROLOG);
+				}else if(vmEle[4].equalsIgnoreCase("Susp")){
+					vm.setState(VMState.SUSPEND);
+				}else{
+					vm.setState(VMState.NOT_DEFINED);
+				}
+				
+				
+				vmList.add(vm);				
+			}
+		}else{
+			System.out.println(feedBack.get(0));
+			return null;
+		}
+		
+		return vmList;
 	}
 
 	@Override
-	public boolean destroyVM(String id) {
+	public ArrayList<VMelement> destroyVM(String id) {
 		// TODO Auto-generated method stub
 		String cmdLine = "onevm delete "+id;
-	//	System.out.println(cmdLine);
-		return this.socketToproxy(cmdLine);
-		 
+		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<String> feedBack = socketToproxy(cmdLine);
+		if(feedBack!=null&&!feedBack.isEmpty()){
+			System.out.println(feedBack.get(0));
+			return null;
+		}
+		VMelement vm = new VMelement();
+		vm.setId(id);
+		vm.setState(VMState.STOP);
+		vmList.add(vm);
+		return vmList; 
 	}
 
 	@Override
-	public boolean startVM(String id) {
+	public ArrayList<VMelement> startVM(String id) {
 		// TODO Auto-generated method stub
 		String cmdLine="onevm resume "+id;
- 		
-		return this.socketToproxy(cmdLine);
+		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<String> feedBack = socketToproxy(cmdLine);
+		if(feedBack!=null&&!feedBack.isEmpty()){
+			System.out.println(feedBack.get(0));
+			return null;
+		}
+		VMelement vm = new VMelement();
+		vm.setId(id);
+		vm.setState(VMState.PROLOG);
+		vmList.add(vm);
+		return vmList;
 	}
 
 	@Override
-	public boolean suspendVM(String id) {
+	public ArrayList<VMelement> suspendVM(String id) {
 		// TODO Auto-generated method stub
 		String cmdLine = "onevm suspend "+id;
-		this.socketToproxy(cmdLine);
-		return false;
+		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<String> feedBack = socketToproxy(cmdLine);
+		if(feedBack!=null&&!feedBack.isEmpty()){
+			System.out.println(feedBack.get(0));
+			return null;
+		}
+		VMelement vm = new VMelement();
+		vm.setId(id);
+		vm.setState(VMState.SUSPEND);
+		vmList.add(vm);
+		return vmList;
 	}
 
-	@Override
-	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
-	private String addr = "fcl301.fnal.gov";
-	private int port = 9734;
+
+
+
+	private String addr;
+	private int port;
+	private String username;
+	private String template;
+
 
 }

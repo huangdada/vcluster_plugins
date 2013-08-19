@@ -1,6 +1,10 @@
 package vcluster.plugin.econe;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -14,21 +18,67 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import vcluster.control.VMelement;
 import vcluster.plugman.CloudInterface;
-
 import com.sun.xml.bind.StringInputStream;
 
 
 
 
 public class Econe implements CloudInterface{
-	
-	CloudElement cloud = null;
-	@Override
-	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
+
+	public static void main(String[] arg){
+				
+	    String cmdLine = "";
+	    Econe ec = new Econe();
+	    ec.cloud.setAccessKey("dada");
+	    ec.cloud.setCloudType("public");
+	    ec.cloud.setEndPoint("http://150.183.233.60:4567/");
+	    ec.cloud.setImageName("ami-0000002");
+	    ec.cloud.setInstanceType("m1.small");
+	    ec.cloud.setSecretKey("fedd1d1122aa65028c81e16ceb85d9c73790a2fa");
+	    ec.cloud.setSignatureMethod("HmacSHA256");
+	    ec.cloud.setSignatureVersion("2");
+	    ec.cloud.setVersion("2011-05-15");
+	    
+	    
+	    /* prompt */
+	   do{
+		    System.out.print("EconeTesting > ");
+			
+		    InputStreamReader input = new InputStreamReader(System.in);
+		    BufferedReader reader = new BufferedReader(input);
+		    
+		    try {
+			    /* get a command string */
+		    	cmdLine = reader.readLine(); 
+		    }
+		    catch(Exception e){e.printStackTrace();}	
+		    
+		    String[] cmds = cmdLine.split(" ");
+			if(cmds[1].equalsIgnoreCase("list")){
+				ec.listVMs();
+			}else if(cmds[1].equalsIgnoreCase("create")){
+				int nums = Integer.parseInt(cmds[2]);
+				ec.createVM(nums);
+			}else if(cmds[1].equalsIgnoreCase("destroy")){
+						ec.destroyVM(cmds[2]);
+			}else if(cmds[1].equalsIgnoreCase("suspend")){
+				ec.suspendVM(cmds[2]);
+			}else if(cmds[1].equalsIgnoreCase("start")){
+				ec.startVM(cmds[2]);						
+			}
+			else{
+				//ec.socketToproxy(cmdLine);
+			}
+	   }while(!cmdLine.equals("quit"));
 	}
+	
+	
+	
+	CloudElement cloud = new CloudElement();
+
+
 	
 	private static String makeGETQuery(CloudElement cloud, QueryInfo ci) 
 			throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException
@@ -54,7 +104,7 @@ public class Econe implements CloudInterface{
 		            
 		   			queryString += keyName+"="+URLEncoder.encode(ci.getAttrValue(keyName).toString(), "UTF-8");
 				}
-
+				//System.out.println("after 22222");
 				stringToSign.append(queryString);
 		        String signature = GetSignature.calculateRFC2104HMAC(new String(stringToSign), 
 		        		cloud.getSecretKey(), cloud.getSignatureMethod());
@@ -64,33 +114,38 @@ public class Econe implements CloudInterface{
 			}
 			
 
-	public static void executeQuery(Command command,String fullURL, String httpQuery)
+	public static ArrayList<VMelement> executeQuery(Command command,String fullURL, String httpQuery)
 	{
 		try {
 			URL endPoint = new URL(fullURL+"?"+httpQuery);
-			doHttpQuery(command,endPoint);
+			return doHttpQuery(command,endPoint);
 		} catch (Exception e)
 		{
 			e.printStackTrace();
+			
 		}
+		return null;
 	}
 
-	private static void doHttpQuery(Command command,URL endPoint) throws Exception {
+	private static ArrayList<VMelement> doHttpQuery(Command command,URL endPoint) throws Exception {
 		HttpURLConnection con = (HttpURLConnection) endPoint.openConnection();
-
+		ArrayList<VMelement> vmList = null;
 		con.setRequestMethod("GET");
 		con.setDoOutput(true);
 		con.connect();
 		String respStr;
-		//System.out.println(endPoint.toString());
+	//	System.out.println(endPoint.toString());
 		if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
 			ResponseDataHandler.handlError(con.getErrorStream());
 		} else {
-			System.out.println("MARK 2");
+			//System.out.println("MARK 2");
 			respStr = getResponseString(con.getInputStream());
-			ResponseDataHandler.handleResponse(command, new StringInputStream(respStr));
+			//System.out.println(respStr);
+			vmList = ResponseDataHandler.handleResponse(command, new StringInputStream(respStr));
 		}
 		con.disconnect();
+		return vmList;
+
 	}
 
 	
@@ -118,9 +173,9 @@ public class Econe implements CloudInterface{
 	}
 
 	@Override
-	public boolean createVM(int maxCount) {
+	public ArrayList<VMelement> createVM(int maxCount) {
 		
-		System.out.println("Under devoleping.......");
+		//System.out.println("Under devoleping.......");
 		QueryInfo qi = new QueryInfo();
 		
 		qi.putValue("Action", Command.RUN_INSTANCE.getCommand());
@@ -144,17 +199,17 @@ public class Econe implements CloudInterface{
 		qi.putValue("SignatureVersion", cloud.getSignatureVersion());
 		qi.putValue("SignatureMethod", cloud.getSignatureMethod());
 		
-
+		//System.out.println("before");
 		String query = null;
 		try {
 			query = makeGETQuery(cloud, qi);
+			//System.out.println("before2");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		//System.out.println(cloud.getEndPoint());
+		return executeQuery(Command.RUN_INSTANCE, cloud.getEndPoint(), query);
 
-    	executeQuery(Command.RUN_INSTANCE, cloud.getEndPoint(), query);
-    	
-    	return true;
 		// TODO Auto-generated method stub
 		/*Thread t = new Thread() {
 			public void run() {
@@ -168,18 +223,14 @@ public class Econe implements CloudInterface{
 	}
 
 	@Override
-	public boolean listVMs() {
+	public ArrayList<VMelement> listVMs() {
 		// TODO Auto-generated method stub
-		System.out.println("MARK 1...................................");
+		//System.out.println("MARK 1...................................");
+		//ArrayList<VMelement> vmList = null;
 		QueryInfo qi = new QueryInfo();
 
-		String id = null;
-
+		//qi.putValue("Action", "DescribeInstances");
 		qi.putValue("Action", "DescribeInstances");
-
-		if (id != null)
-			qi.putValue("InstanceId.1", id);
-		
 		String timestamp = Util.getTimestampFromLocalTime(Calendar.getInstance().getTime());
 
 		/* fill the default values */
@@ -198,15 +249,12 @@ public class Econe implements CloudInterface{
 		}
 
 		
-    	executeQuery(Command.DESCRIBE_INSTANCE,cloud.getEndPoint(), query);
+    	return executeQuery(Command.DESCRIBE_INSTANCE,cloud.getEndPoint(), query);
 
-		
-    	System.out.println(query);
-    	return true;
 	}
 
 	@Override
-	public boolean destroyVM(String id) {
+	public ArrayList<VMelement> destroyVM(String id) {
 		// TODO Auto-generated method stub
 
 		QueryInfo qi = new QueryInfo();
@@ -226,24 +274,57 @@ public class Econe implements CloudInterface{
 			e.printStackTrace();
 		}
 
-    	executeQuery(Command.TERMINATE_INSTANCE, cloud.getEndPoint(), query);
-		
-		
-    	return true;
+        return 	executeQuery(Command.TERMINATE_INSTANCE, cloud.getEndPoint(), query);
+
 	}
 
 	@Override
-	public boolean startVM(String para) {
+	public ArrayList<VMelement> startVM(String id) {
 		// TODO Auto-generated method stub
-		return false;
+		QueryInfo qi = new QueryInfo();
+
+		qi.putValue("Action", "StartInstances");
+		qi.putValue("InstanceId.1", id);
+
+		/* fill the default values */
+		qi.putValue("SignatureVersion", cloud.getSignatureVersion());
+		qi.putValue("SignatureMethod", cloud.getSignatureMethod());
+
+		
+		String query = null;
+		try {
+			query = makeGETQuery(cloud, qi);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+    	return executeQuery(Command.TERMINATE_INSTANCE, cloud.getEndPoint(), query);
+	
 	}
 
 	@Override
-	public boolean suspendVM(String para) {
+	public ArrayList<VMelement> suspendVM(String id) {
 		// TODO Auto-generated method stub
-		return false;
-	}
+		QueryInfo qi = new QueryInfo();
 
+		qi.putValue("Action", "StopInstances");
+		qi.putValue("InstanceId.1", id);
+
+		/* fill the default values */
+		qi.putValue("SignatureVersion", cloud.getSignatureVersion());
+		qi.putValue("SignatureMethod", cloud.getSignatureMethod());
+
+		
+		String query = null;
+		try {
+			query = makeGETQuery(cloud, qi);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+    	return executeQuery(Command.TERMINATE_INSTANCE, cloud.getEndPoint(), query);
+		
+	}
 
 	
 }

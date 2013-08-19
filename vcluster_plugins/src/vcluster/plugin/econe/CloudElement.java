@@ -3,7 +3,7 @@ package vcluster.plugin.econe;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import vcluster.plugin.econe.Config.CloudType;
+import vcluster.global.Config.CloudType;
 import vcluster.plugin.econe.PrintMsg.DMsgType;
 
 public class CloudElement {

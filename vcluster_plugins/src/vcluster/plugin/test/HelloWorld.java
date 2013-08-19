@@ -66,12 +66,6 @@ public class HelloWorld implements BatchInterface {
 
 
 	@Override
-	public String getInfo() {
-		// TODO Auto-generated method stub
-		return "This is a test plugin";
-	}
-
-	@Override
 	public boolean ConnectTo(File conf) {
 		// TODO Auto-generated method stub
 		return false;

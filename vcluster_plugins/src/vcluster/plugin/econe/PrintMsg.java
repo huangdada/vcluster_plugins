@@ -1,5 +1,7 @@
 package vcluster.plugin.econe;
 
+import vcluster.global.Config;
+
 
 public class PrintMsg {
 	

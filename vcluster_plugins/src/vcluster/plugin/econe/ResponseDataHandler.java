@@ -1,10 +1,13 @@
 package vcluster.plugin.econe;
 
+import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -17,9 +20,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import vcluster.control.VMelement;
+import vcluster.global.Config;
+import vcluster.global.Config.VMState;
+
 public class ResponseDataHandler {
 	
-	public static void handleResponse(Command command, InputStream is) throws Exception 
+	public static ArrayList<VMelement> handleResponse(Command command, InputStream is) throws Exception 
 	{
 		/*BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 		StringBuffer sb = new StringBuffer(); 
@@ -32,30 +39,101 @@ public class ResponseDataHandler {
 	System.out.println(sb.toString()+"\n");*/
 		
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
 
 		switch(command) {
 		case DESCRIBE_INSTANCE:
-			describeInstanceResponse(doc);
+			vmList =  describeInstanceResponse(doc);
 			break;
 		case DESCRIBE_IMAGE:
 			describeImageResponse(doc);
-			
 			break;
+		case RUN_INSTANCE:
+			vmList =  operateResponse(doc);
+			break;
+		case TERMINATE_INSTANCE:
+			vmList =  operateResponse(doc);
+			break;
+		case STOP_INSTANCE:
+			vmList =  operateResponse(doc);
+			break;
+		case START_INSTANCE:
+			vmList =  operateResponse(doc);
+			break;		
 		}
-
+		
 		saveResponse(doc);
+		return vmList;
 	}
 
 
 
-	private static void describeInstanceResponse(Document doc) throws Exception 
+
+	private static ArrayList<VMelement> operateResponse(Document doc) {
+		// TODO Auto-generated method stub
+		 ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		Element instNodeList = findFirstMatchedNode(doc, "instancesSet");
+
+		if (instNodeList == null) {
+			System.out.println("[Error] : cannot find instanceSet element!");
+			
+		}
+
+		String instanceId = "";
+		String instanceState = "";
+		for(int i = 0; i < instNodeList.getElementsByTagName("item").getLength();i++) {
+			VMelement vm = new VMelement();
+
+			Element anItem = (Element)instNodeList.getElementsByTagName("item").item(i);
+
+				instanceId = getTextValue(anItem,"instanceId");
+				if (instanceId == null || instanceId.equals("")) 
+					continue;
+				
+				instanceState = getTextValue(anItem,"name");
+				if (instanceState == null || instanceState.equals("")) 
+					continue;
+				
+				//System.out.println(instanceId+"\t\t"+instanceState);
+				vm.setId(instanceId);
+				if(instanceState.equalsIgnoreCase("running")){
+					vm.setState(VMState.RUNNING);
+				}else if(instanceState.equalsIgnoreCase("stoped")){
+					vm.setState(VMState.STOP);
+				}else if(instanceState.equalsIgnoreCase("Pending")){
+					vm.setState(VMState.PENDING);
+				}else if(instanceState.equalsIgnoreCase("Prolog")){
+					vm.setState(VMState.PROLOG);
+				}else if(instanceState.equalsIgnoreCase("Suspended")){
+					vm.setState(VMState.SUSPEND);
+				}else if(instanceState.equalsIgnoreCase("terminated")){
+					vm.setState(VMState.FAILED);
+				}
+				else{
+					vm.setState(VMState.NOT_DEFINED);
+				}
+				vmList.add(vm);
+			
+			
+			
+		}
+
+		//System.out.println("----------------------------------------");
+		return vmList;
+	}
+
+
+
+
+	private static ArrayList<VMelement> describeInstanceResponse(Document doc) throws Exception 
 	{
 
+		 ArrayList<VMelement> vmList = new ArrayList<VMelement>();
 		Element reservSet = findFirstMatchedNode(doc, "reservationSet");
 
 		if (reservSet == null) {
 			System.out.println("[Error] : cannot find instanceSet element!");
-			return;
+			
 		}
 
 		//get a nodelist of  elements
@@ -63,39 +141,64 @@ public class ResponseDataHandler {
 
 		if(instNodeList == null || instNodeList.getLength() <= 0) {
 			System.out.println("[Error] : but no item element!");
+			
 		}
 
-		System.out.println("----------------------------------------");
-		System.out.println("Inst ID\t\tStatus");
-		System.out.println("----------------------------------------");
+		//System.out.println("----------------------------------------");
+		//System.out.println("Inst ID\t\tStatus");
+		//System.out.println("----------------------------------------");
 
 		String instanceId = "";
 		String instanceState = "";
+		String privateIP = "";
+		String publicIP = "";
+		String lunTime ="";
 		for(int i = 0 ; i < instNodeList.getLength();i++) {
-			//get an instanceId element
-
-			//get a nodelist of  item elements
+			
 			Element anElement = (Element)instNodeList.item(i);
 			NodeList itemNodeList = anElement.getElementsByTagName("item");
 			for(int j = 0; j < itemNodeList.getLength(); j++) {
+				VMelement vm = new VMelement();
 				Element anItem = (Element)itemNodeList.item(j);
 				instanceId = getTextValue(anItem,"instanceId");
+				String [] ipStr = getTextValue(anItem,"privateIpAddress").split(",");
+				privateIP = ipStr[0].trim();
+				publicIP = ipStr[1].trim();
+				lunTime = getTextValue(anItem,"launchTime");
 				if (instanceId == null || instanceId.equals("")) 
 					continue;
-
+				
 				instanceState = getTextValue(anItem,"name");
 				if (instanceState == null || instanceState.equals("")) 
 					continue;
 				
-				System.out.println(instanceId+"\t\t"+instanceState);
-				
+				vm.setId(instanceId);
+				vm.setPrivateIP(privateIP);
+				vm.setPubicIP(publicIP);
+				vm.setTime(lunTime);
+				if(instanceState.equalsIgnoreCase("running")){
+					vm.setState(VMState.RUNNING);
+				}else if(instanceState.equalsIgnoreCase("stoped")){
+					vm.setState(VMState.STOP);
+				}else if(instanceState.equalsIgnoreCase("Pending")){
+					vm.setState(VMState.PENDING);
+				}else if(instanceState.equalsIgnoreCase("Prolog")){
+					vm.setState(VMState.PROLOG);
+				}else if(instanceState.equalsIgnoreCase("Suspended")){
+					vm.setState(VMState.SUSPEND);
+				}else if(instanceState.equalsIgnoreCase("terminated")){
+					vm.setState(VMState.FAILED);
+				}else{
+					vm.setState(VMState.NOT_DEFINED);
+				}
+				vmList.add(vm);
 			}
 			
 			
 		}
 
-		System.out.println("----------------------------------------");
-
+		//System.out.println("----------------------------------------");
+		return vmList;
 		//saveResponse(doc);
 	}
 
@@ -168,7 +271,7 @@ public class ResponseDataHandler {
 	public static void handlError(InputStream is) throws Exception 
 	{
 		
-		/*BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 			StringBuffer sb = new StringBuffer(); 
 			String line; 
 			while ((line = rd.readLine()) != null) {
@@ -176,7 +279,7 @@ public class ResponseDataHandler {
 			} 
 			rd.close();	
 		
-		System.out.println(sb.toString()+"\n");*/
+		System.out.println(sb.toString()+"\n");
 	
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 
@@ -219,9 +322,7 @@ public class ResponseDataHandler {
 	
    
 	private static void saveResponse(Document doc) throws Exception
-	{
-		
-		
+	{		
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
