@@ -186,24 +186,30 @@ public class Proxy implements CloudInterface {
 			for(int i = 1;i<feedBack.size();i++){
 				
 				String [] vmEle = feedBack.get(i).split("\\s+");
-				VMelement vm = new VMelement();
-				vm.setId(vmEle[0]);
-				//vm.setState(vmEle[4]);
-				if(vmEle[4].equalsIgnoreCase("runn")){
-					vm.setState(VMState.RUNNING);
-				}else if(vmEle[4].equalsIgnoreCase("stop")){
-					vm.setState(VMState.STOP);
-				}else if(vmEle[4].equalsIgnoreCase("Pend")){
-					vm.setState(VMState.PENDING);
-				}else if(vmEle[4].equalsIgnoreCase("Prol")){
-					vm.setState(VMState.PROLOG);
-				}else if(vmEle[4].equalsIgnoreCase("Susp")){
-					vm.setState(VMState.SUSPEND);
-				}else{
-					vm.setState(VMState.NOT_DEFINED);
+				if(vmEle.length<10){
+					continue;
 				}
+				VMelement vm = new VMelement();
+				try{
+					vm.setId(vmEle[0]);
+					//vm.setState(vmEle[4]);
+					if(vmEle[4].equalsIgnoreCase("runn")){
+						vm.setState(VMState.RUNNING);
+					}else if(vmEle[4].equalsIgnoreCase("stop")){
+						vm.setState(VMState.STOP);
+					}else if(vmEle[4].equalsIgnoreCase("Pend")){
+						vm.setState(VMState.PENDING);
+					}else if(vmEle[4].equalsIgnoreCase("Prol")){
+						vm.setState(VMState.PROLOG);
+					}else if(vmEle[4].equalsIgnoreCase("Susp")){
+						vm.setState(VMState.SUSPEND);
+					}else{
+						vm.setState(VMState.NOT_DEFINED);
+					}
 				
-				
+				}catch(Exception e){
+					continue;
+				}
 				vmList.add(vm);				
 			}
 		}else{
