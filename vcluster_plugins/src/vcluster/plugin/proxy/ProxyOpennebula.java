@@ -1,7 +1,10 @@
 package vcluster.plugin.proxy;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -10,19 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import vcluster.control.VMelement;
+import vcluster.control.vmman.Vm;
 import vcluster.global.Config.VMState;
-import vcluster.plugman.CloudInterface;
+import vcluster.plugins.CloudInterface;
 
-public class Proxy implements CloudInterface {
+public class ProxyOpennebula implements CloudInterface {
 	
 	public static void main(String[] arg){
+
+		
 	    String cmdLine = "";
-	    Proxy proxy = new Proxy();
-	    proxy.RegisterCloud(new ArrayList<String>());
+	    ProxyOpennebula proxyOpennebula = new ProxyOpennebula();
+	    //proxyOpennebula.RegisterCloud(new ArrayList<String>());
+	    proxyOpennebula.addr="150.183.233.60";
+	    proxyOpennebula.port=9734;
+	    File f = new File("e:"+File.separator+"vmlist.txt");
 	    /* prompt */
 	   do{
-		    System.out.print("vcluter > ");
+		    System.out.print("proxyTest > ");
 			
 		    InputStreamReader input = new InputStreamReader(System.in);
 		    BufferedReader reader = new BufferedReader(input);
@@ -30,27 +38,37 @@ public class Proxy implements CloudInterface {
 		    try {
 			    /* get a command string */
 		    	cmdLine = reader.readLine(); 
+		    	reader.close();
+		    	System.out.println(cmdLine);
 		    }
 		    catch(Exception e){e.printStackTrace();}	
+		   ArrayList<String> feedback = proxyOpennebula.socketToproxy(cmdLine);
+		
+		   if(!f.exists()){
+			   try {
+				f.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		   }
+		   try {
+			   FileWriter fw=new FileWriter(f);
+			   BufferedWriter bw=new BufferedWriter(fw); 			   
+			   for(String line : feedback){
+				   System.out.println(line);
+				   bw.write(line); 
+			       bw.newLine();//
+			   }
+			   bw.close();
+			   fw.close();
+			   
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		    
-		    String[] cmds = cmdLine.split(" ");
-			//proxy.socketToproxy(cmdLine);
-		   
-			if(cmds[1].equalsIgnoreCase("list")){
-				proxy.listVMs();
-			}else if(cmds[1].equalsIgnoreCase("create")){
-				int nums = Integer.parseInt(cmds[2]);
-				proxy.createVM(nums);
-			}else if(cmds[1].equalsIgnoreCase("destroy")){
-						proxy.destroyVM(cmds[2]);
-			}else if(cmds[1].equalsIgnoreCase("suspend")){
-				proxy.suspendVM(cmds[2]);
-			}
-			else if(cmds[1].equalsIgnoreCase("start")){
-				proxy.startVM(cmds[2]);
-			}else{
-					proxy.socketToproxy(cmdLine);
-			}
+		    
 	   }while(!cmdLine.equals("quit"));
 	}
 	
@@ -89,7 +107,7 @@ public class Proxy implements CloudInterface {
 	            
 	            out.write(b, 0, b.length);
 	            out.write(cmdLine.getBytes(), 0, cmdLine.getBytes().length);
-	            
+	            out.flush();
 	            char[] cbuf = new char[1024];
 	        	String temp = null;
 	        	while (in.read(cbuf, 0, 1024) != -1) {
@@ -122,10 +140,10 @@ public class Proxy implements CloudInterface {
 	@Override
 	public boolean RegisterCloud(List<String> configurations) {
 		// TODO Auto-generated method stub
-		//configurations.add("username=amol");
-		//configurations.add("endpoint=fcl301.fnal.gov");
-		//configurations.add("port=9734");
-		//configurations.add("template = OpenNebula/clean.one");
+		/*configurations.add("username=amol");
+		configurations.add("endpoint=fcl301.fnal.gov");
+		configurations.add("port=9734");
+		configurations.add("template = OpenNebula/clean.one");*/
 		for(String aLine : configurations){
 			
 			StringTokenizer st = new StringTokenizer(aLine, "=");
@@ -151,22 +169,38 @@ public class Proxy implements CloudInterface {
 			}
 			
 		}
+		ArrayList<String> dateR = socketToproxy("date -R");
+		//if(dateR.get(0).split(regex))
+		
+		int timeD = 0;
+		try {
+			if(dateR!=null&&!dateR.isEmpty())
+			timeD = Integer.parseInt(dateR.get(0).split(" ")[5].replaceAll("0", ""));
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		timediff = 0-timeD+9;
 		return true;
 	}
 
 	@Override
-	public ArrayList<VMelement> createVM(int maxCount) {
+	public ArrayList<Vm> createVM(int maxCount) {
 		// TODO Auto-generated method stub
 		String cmdLine="onevm create "+template +" -m "+maxCount;	
-		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		System.out.println(cmdLine);
+		String hostName = template.replace(".one", "");
+		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()&&feedBack.get(0).contains("ID:")){
 			for(int i = 0;i<feedBack.size();i++){
 				
 				String [] vmEle = feedBack.get(i).split("\\s+");
-				VMelement vm = new VMelement();
+				Vm vm = new Vm();
 				vm.setId(vmEle[1]);
 				vm.setState(VMState.PROLOG);
+				vm.setHostname(hostName);
 				vmList.add(vm);				
 			}
 		}else{
@@ -175,12 +209,37 @@ public class Proxy implements CloudInterface {
 		}
 			return vmList;
 	}
+	private boolean getVminf(Vm vm){
+		ArrayList<String> feedBack = socketToproxy("onevm show "+vm.getId()+" | grep IP");
+
+		
+		if(feedBack!=null&&!feedBack.isEmpty()){
+			
+			for(String str : feedBack){
+					try {
+						if(str.contains("IP_PUBLIC")){
+							vm.setPubicIP(str.split("=")[1].replace(",", "").replaceAll("\"", "").trim());
+						}else if(str.contains("IP=")){
+							vm.setPrivateIP(str.split("=")[1].trim().replace(",", "").replaceAll("\"", ""));
+						}
+						else if(str.contains("IP_PRIVATE")){
+							vm.setPrivateIP(str.split("=")[1].replace(",", "").replaceAll("\"", ""));
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						return false;
+					}
+				}
+			return true;
+		}
+		return false;
+	}
 
 	@Override
-	public ArrayList<VMelement> listVMs() {
+	public ArrayList<Vm> listVMs() {
 		// TODO Auto-generated method stub
 		String cmdLine="onevm list "+username;
-		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()&&feedBack.get(0).contains("ID")){
 			for(int i = 1;i<feedBack.size();i++){
@@ -189,10 +248,12 @@ public class Proxy implements CloudInterface {
 				if(vmEle.length<10){
 					continue;
 				}
-				VMelement vm = new VMelement();
+				Vm vm = new Vm();
 				try{
 					vm.setId(vmEle[0]);
 					//vm.setState(vmEle[4]);
+					getVminf(vm);
+					vm.setHostname(vmEle[7]);
 					if(vmEle[4].equalsIgnoreCase("runn")){
 						vm.setState(VMState.RUNNING);
 					}else if(vmEle[4].equalsIgnoreCase("stop")){
@@ -210,6 +271,7 @@ public class Proxy implements CloudInterface {
 				}catch(Exception e){
 					continue;
 				}
+
 				vmList.add(vm);				
 			}
 		}else{
@@ -221,16 +283,16 @@ public class Proxy implements CloudInterface {
 	}
 
 	@Override
-	public ArrayList<VMelement> destroyVM(String id) {
+	public ArrayList<Vm> destroyVM(String id) {
 		// TODO Auto-generated method stub
 		String cmdLine = "onevm delete "+id;
-		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()){
 			System.out.println(feedBack.get(0));
 			return null;
 		}
-		VMelement vm = new VMelement();
+		Vm vm = new Vm();
 		vm.setId(id);
 		vm.setState(VMState.STOP);
 		vmList.add(vm);
@@ -238,16 +300,16 @@ public class Proxy implements CloudInterface {
 	}
 
 	@Override
-	public ArrayList<VMelement> startVM(String id) {
+	public ArrayList<Vm> startVM(String id) {
 		// TODO Auto-generated method stub
 		String cmdLine="onevm resume "+id;
-		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()){
 			System.out.println(feedBack.get(0));
 			return null;
 		}
-		VMelement vm = new VMelement();
+		Vm vm = new Vm();
 		vm.setId(id);
 		vm.setState(VMState.PROLOG);
 		vmList.add(vm);
@@ -255,16 +317,16 @@ public class Proxy implements CloudInterface {
 	}
 
 	@Override
-	public ArrayList<VMelement> suspendVM(String id) {
+	public ArrayList<Vm> suspendVM(String id) {
 		// TODO Auto-generated method stub
 		String cmdLine = "onevm suspend "+id;
-		ArrayList<VMelement> vmList = new ArrayList<VMelement>();
+		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()){
 			System.out.println(feedBack.get(0));
 			return null;
 		}
-		VMelement vm = new VMelement();
+		Vm vm = new Vm();
 		vm.setId(id);
 		vm.setState(VMState.SUSPEND);
 		vmList.add(vm);
@@ -279,6 +341,7 @@ public class Proxy implements CloudInterface {
 	private int port;
 	private String username;
 	private String template;
+	private int timediff;
 
 
 }

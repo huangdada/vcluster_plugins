@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<DescribeInstancesResponse xmlns="http://ec2.amazonaws.com/doc/2011-05-15/">
+<requestId>8d63964e-cd2e-4029-aa09-fb4119982167</requestId>
+<reservationSet>
+<item>
+<reservationId>default</reservationId>
+<ownerId>dada</ownerId>
+<groupSet>
+<item>
+<groupId>default</groupId>
+</item>
+</groupSet>
+<instancesSet>
+<item>
+<instanceId>i-00000028</instanceId>
+<imageId/>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.44, 192.1.1.34</privateIpAddress>
+<privateDnsName>192.168.56.44, 192.1.1.34</privateDnsName>
+<dnsName>192.168.56.44, 192.1.1.34</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType/>
+<launchTime>2013-08-08T15:03:59+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>28</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000029</instanceId>
+<imageId/>
+<instanceState>
+<code>48</code>
+<name>terminated</name>
+</instanceState>
+<privateIpAddress>192.168.56.45, 192.1.1.35</privateIpAddress>
+<privateDnsName>192.168.56.45, 192.1.1.35</privateDnsName>
+<dnsName>192.168.56.45, 192.1.1.35</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType/>
+<launchTime>2013-08-08T15:04:10+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>29</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000043</instanceId>
+<imageId/>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.24, 192.1.1.14</privateIpAddress>
+<privateDnsName>192.168.56.24, 192.1.1.14</privateDnsName>
+<dnsName>192.168.56.24, 192.1.1.14</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType/>
+<launchTime>2013-08-12T17:50:04+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>43</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000066</instanceId>
+<imageId/>
+<instanceState>
+<code>80</code>
+<name>stopped</name>
+</instanceState>
+<privateIpAddress>192.168.56.42, 192.1.1.29</privateIpAddress>
+<privateDnsName>192.168.56.42, 192.1.1.29</privateDnsName>
+<dnsName>192.168.56.42, 192.1.1.29</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType/>
+<launchTime>2013-08-14T11:44:46+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>66</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000073</instanceId>
+<imageId>ami-00000002</imageId>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.53, 192.1.1.36</privateIpAddress>
+<privateDnsName>192.168.56.53, 192.1.1.36</privateDnsName>
+<dnsName>192.168.56.53, 192.1.1.36</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType>m1.small</instanceType>
+<launchTime>2013-08-14T13:01:55+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>73</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000075</instanceId>
+<imageId>ami-00000002</imageId>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.55, 192.1.1.38</privateIpAddress>
+<privateDnsName>192.168.56.55, 192.1.1.38</privateDnsName>
+<dnsName>192.168.56.55, 192.1.1.38</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType>m1.small</instanceType>
+<launchTime>2013-08-14T14:35:52+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>75</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000076</instanceId>
+<imageId>ami-00000002</imageId>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.56, 192.1.1.39</privateIpAddress>
+<privateDnsName>192.168.56.56, 192.1.1.39</privateDnsName>
+<dnsName>192.168.56.56, 192.1.1.39</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType>m1.test</instanceType>
+<launchTime>2013-08-14T14:54:31+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>76</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000077</instanceId>
+<imageId>ami-00000002</imageId>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.22, 192.1.1.12</privateIpAddress>
+<privateDnsName>192.168.56.22, 192.1.1.12</privateDnsName>
+<dnsName>192.168.56.22, 192.1.1.12</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType>m1.test</instanceType>
+<launchTime>2013-08-16T12:06:02+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>77</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+<item>
+<instanceId>i-00000078</instanceId>
+<imageId>ami-0000002</imageId>
+<instanceState>
+<code>16</code>
+<name>running</name>
+</instanceState>
+<privateIpAddress>192.168.56.23, 192.1.1.13</privateIpAddress>
+<privateDnsName>192.168.56.23, 192.1.1.13</privateDnsName>
+<dnsName>192.168.56.23, 192.1.1.13</dnsName>
+<keyName>none</keyName>
+<productCodes/>
+<instanceType>m1.small</instanceType>
+<launchTime>2013-08-16T12:45:43+09:00</launchTime>
+<placement>
+<availabilityZone>default</availabilityZone>
+</placement>
+<amiLaunchIndex>78</amiLaunchIndex>
+<kernelId>eki-EA801065</kernelId>
+<ramdiskId>eri-1FEE1144</ramdiskId>
+<monitoring>
+<state>false</state>
+</monitoring>
+</item>
+</instancesSet>
+</item>
+</reservationSet>
+</DescribeInstancesResponse>
+

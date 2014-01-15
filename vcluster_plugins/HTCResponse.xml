@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<classads>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>fermicloud042.fnal.gov</s>
+</a>
+<a n="MyAddress">
+<s>&lt;131.225.154.178:9633&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>fermicloud131.fnal.gov</s>
+</a>
+<a n="MyAddress">
+<s>&lt;131.225.154.44:9645&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>fermicloud132.fnal.gov</s>
+</a>
+<a n="MyAddress">
+<s>&lt;131.225.154.57:9699&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>fermicloud148.fnal.gov</s>
+</a>
+<a n="MyAddress">
+<s>&lt;131.225.155.149:9696&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>fermicloud150.fnal.gov</s>
+</a>
+<a n="MyAddress">
+<s>&lt;131.225.155.151:9682&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>gcloud-vm345.kisti.re.kr</s>
+</a>
+<a n="MyAddress">
+<s>&lt;192.168.56.49:9642&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+<c>
+<a n="MyType">
+<s>Machine</s>
+</a>
+<a n="Activity">
+<s>Idle</s>
+</a>
+<a n="Name">
+<s>gcloud-vm346</s>
+</a>
+<a n="MyAddress">
+<s>&lt;192.168.56.50:9671&gt;</s>
+</a>
+<a n="TargetType">
+<s>Job</s>
+</a>
+<a n="CurrentTime">
+<e>time()</e>
+</a>
+</c>
+</classads>
+

@@ -1,14 +1,14 @@
-package vcluster.plugin.econe;
+package vcluster.plugin.ec2gcloud;
 
 import java.util.List;
 import java.util.StringTokenizer;
 
 import vcluster.global.Config.CloudType;
-import vcluster.plugin.econe.PrintMsg.DMsgType;
+import vcluster.plugin.ec2gcloud.PrintMsg.DMsgType;
 
-public class CloudElement {
+public class Cloud {
 	
-	protected CloudElement() {
+	protected Cloud() {
 		cloudType = CloudType.NOT_DEFINED;
 		endPoint = null;
 		maxVMs = -1;
@@ -20,7 +20,7 @@ public class CloudElement {
 		imageName = null;
 	}
 	
-	CloudElement(List<String> configurations){
+	Cloud(List<String> configurations){
 		for(String aLine : configurations){
 			
 			StringTokenizer st = new StringTokenizer(aLine, "=");

@@ -1,4 +1,4 @@
-package vcluster.plugin.econe;
+package vcluster.plugin.ec2gcloud;
 
 import java.io.BufferedReader;
 import java.io.FileWriter;
@@ -163,12 +163,16 @@ public class ResponseDataHandler {
 				String [] ipStr = ips.split(",");
 				privateIP = ipStr[0].trim();
 				if(ipStr.length>1){publicIP = ipStr[1].trim();}
-				else{try {
-					publicIP =getTextValue(anItem,"ipAddress").split(",")[0].trim();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					publicIP = "";
-				}}
+				else{
+					
+					try {
+						publicIP =getTextValue(anItem,"ipAddress").split(",")[0].trim();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						publicIP = "";
+					}
+					
+				}
 				lunTime = getTextValue(anItem,"launchTime");
 				if (instanceId == null || instanceId.equals("")) 
 					continue;
@@ -181,7 +185,6 @@ public class ResponseDataHandler {
 				vm.setPrivateIP(privateIP);
 				vm.setPubicIP(publicIP);
 				vm.setTime(lunTime);
-				vm.setHostname("host1");
 				if(instanceState.equalsIgnoreCase("running")){
 					vm.setState(VMState.RUNNING);
 				}else if(instanceState.equalsIgnoreCase("stoped")){
@@ -324,7 +327,7 @@ public class ResponseDataHandler {
 		String xmlString = result.getWriter().toString();
 
         try {
-			FileWriter outFile = new FileWriter("amazonResponse.xml");
+			FileWriter outFile = new FileWriter(Config.xmlFile);
 			PrintWriter out = new PrintWriter(outFile);
 			out.println(xmlString);
 			outFile.close();
