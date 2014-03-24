@@ -59,6 +59,8 @@ public class ResponseDataHandler {
 			break;
 		case START_INSTANCE:
 			vmList =  operateResponse(doc);
+			break;
+		default:
 			break;		
 		}
 		
@@ -113,8 +115,7 @@ public class ResponseDataHandler {
 					vm.setState(VMState.NOT_DEFINED);
 				}
 				vmList.add(vm);			
-		}
-		//System.out.println("----------------------------------------");
+		}		
 		return vmList;
 	}
 

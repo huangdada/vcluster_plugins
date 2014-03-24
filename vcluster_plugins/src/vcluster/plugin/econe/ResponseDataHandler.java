@@ -21,7 +21,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import vcluster.control.vmman.Vm;
-import vcluster.global.Config;
 import vcluster.global.Config.VMState;
 
 public class ResponseDataHandler {
@@ -59,14 +58,14 @@ public class ResponseDataHandler {
 			break;
 		case START_INSTANCE:
 			vmList =  operateResponse(doc);
+			break;
+		default:
 			break;		
 		}
 		
 		saveResponse(doc);
 		return vmList;
 	}
-
-
 
 
 	private static ArrayList<Vm> operateResponse(Document doc) {
@@ -201,8 +200,9 @@ public class ResponseDataHandler {
 			}			
 		}
 		//System.out.println("----------------------------------------");
+		saveResponse(doc);
 		return vmList;
-		//saveResponse(doc);
+
 	}
 
 	private static void describeImageResponse(Document doc) throws Exception 

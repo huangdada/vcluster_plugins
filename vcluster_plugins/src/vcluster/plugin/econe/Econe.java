@@ -1,22 +1,22 @@
 package vcluster.plugin.econe;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.Socket;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import vcluster.control.vmman.Vm;
 import vcluster.plugins.CloudInterface;
@@ -59,7 +59,8 @@ public class Econe implements CloudInterface{
 		    System.out.println(cmds[1]);
 			if(cmds[1].equalsIgnoreCase("list")){
 				System.out.println("testtesttest");
-				ec.listVMs();
+				//ec.listVMs();
+				ec.rqstHttps();
 			}else if(cmds[1].equalsIgnoreCase("create")){
 				int nums = Integer.parseInt(cmds[2]);
 				ec.createVM(nums);
@@ -79,7 +80,74 @@ public class Econe implements CloudInterface{
 	
 	
 	Cloud cloud = new Cloud();
-
+	private void rqstHttps(){
+      
+      //  final String KEYSTORE_FILE     = "dada.pfx";  
+        
+  //      final String KEYSTORE_PASSWORD = null;  
+  
+      //  final String KEYSTORE_ALIAS    = "alias";  
+		
+        try {
+        	  /* KeyStore ks = KeyStore.getInstance("PKCS12");  
+            
+            FileInputStream fis = new FileInputStream(KEYSTORE_FILE); 
+            char[] nPassword = null;
+            ks.load(fis, nPassword);
+        	fis.close();
+            System.out.println("keystore type=" + ks.getType());  
+            Enumeration enum1 = ks.aliases();  
+            
+            String keyAlias = null;  
+            
+            if (enum1.hasMoreElements()) // we are readin just one certificate.   
+            	  
+            {  
+  
+                keyAlias = (String)enum1.nextElement();  
+  
+                System.out.println("alias=[" + keyAlias + "]");  
+  
+            }  
+  
+   
+  
+            // Now once we know the alias, we could get the keys.   
+  
+            System.out.println("is key entry=" + ks.isKeyEntry(keyAlias));  
+  
+            PrivateKey prikey = (PrivateKey) ks.getKey(keyAlias, nPassword);  
+  
+            java.security.cert.Certificate cert = ks.getCertificate(keyAlias);  
+  
+            PublicKey pubkey = cert.getPublicKey();  
+  
+   
+  
+            System.out.println("cert class = " + cert.getClass().getName());  
+  
+            System.out.println("cert = " + cert);  
+  
+            System.out.println("public key = " + pubkey);  
+  
+            System.out.println("private key = " + prikey);  
+            */
+			URL myURL = new URL("https://fermicloud.fnal.gov:8444/?Action=DescribeInstances&Timestamp=2014-01-16T00%3A15%3A14.632Z"); 
+			HttpsURLConnection httpsConn = (HttpsURLConnection) myURL.openConnection(); 
+			InputStreamReader insr = new InputStreamReader(httpsConn.getInputStream());  
+			int respInt = insr.read();
+			while (respInt != -1) {
+			    System.out.print((char) respInt);
+			    respInt = insr.read();
+			}
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	
 	private static String makeGETQuery(Cloud cloud, QueryInfo ci) 
@@ -108,12 +176,11 @@ public class Econe implements CloudInterface{
 				}
 				//System.out.println("after 22222");
 				stringToSign.append(queryString);
-		        String signature = GetSignature.calculateRFC2104HMAC(new String(stringToSign), 
-		        		cloud.getSecretKey(), cloud.getSignatureMethod());
+		        String signature = GetSignature.calculateRFC2104HMAC(new String(stringToSign), cloud.getSecretKey(), cloud.getSignatureMethod());
 		        
 				String str = (queryString + "&Signature=" + URLEncoder.encode(signature, "UTF-8") 
 						+ "&AWSAccessKeyId="+cloud.getAccessKey());
-				System.out.println(str);
+				//System.out.println(str);
 				return str;
 			}
 			
@@ -124,7 +191,9 @@ public class Econe implements CloudInterface{
 	
 	public static ArrayList<Vm> executeQuery(Command command,String fullURL, String httpQuery)
 	{
-		try {
+
+		
+		try {            
 			URL endPoint = new URL(fullURL+"?"+httpQuery);
 			return doHttpQuery(command,endPoint);
 		} catch (Exception e)
@@ -256,15 +325,15 @@ public class Econe implements CloudInterface{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println(query);
+		//System.out.println(query);
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	//return executeQuery(Command.DESCRIBE_INSTANCE,cloud.getEndPoint(), query);
-		return new ArrayList<Vm> ();
+    	return executeQuery(Command.DESCRIBE_INSTANCE,cloud.getEndPoint(), query);
+		//return new ArrayList<Vm> ();
 	}
 
 	@Override
@@ -341,6 +410,27 @@ public class Econe implements CloudInterface{
 			e.printStackTrace();
 		}
     	return executeQuery(Command.TERMINATE_INSTANCE, cloud.getEndPoint(), query);    	
+	}
+
+
+	@Override
+	public boolean hoston(String ipmiID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean hostoff(String ipmiID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean migrate(String vmid, String hostid) {
+		// TODO Auto-generated method stub
+		return false;
 	}	
 	
 }

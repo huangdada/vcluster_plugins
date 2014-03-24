@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/Users/huangdada/git/project2/lib/jaxb-impl.jar"/>
-	<classpathentry kind="lib" path="D:/git/vcluster/lib/axis.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/project2"/>
+	<classpathentry kind="lib" path="C:/Users/huangdada/git/project2/lib/jaxb-impl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/huangdada/git/project2/lib/axis.jar"/>
 	<classpathentry kind="lib" path="D:/v-cluster/development/aws-java-sdk-1.6.3/lib/aws-java-sdk-1.6.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -20,7 +20,6 @@ import vcluster.plugins.CloudInterface;
 public class ProxyOpennebula implements CloudInterface {
 	
 	public static void main(String[] arg){
-
 		
 	    String cmdLine = "";
 	    ProxyOpennebula proxyOpennebula = new ProxyOpennebula();
@@ -38,7 +37,7 @@ public class ProxyOpennebula implements CloudInterface {
 		    try {
 			    /* get a command string */
 		    	cmdLine = reader.readLine(); 
-		    	reader.close();
+		    	//reader.close();
 		    	System.out.println(cmdLine);
 		    }
 		    catch(Exception e){e.printStackTrace();}	
@@ -158,30 +157,30 @@ public class ProxyOpennebula implements CloudInterface {
 
 			String aValue = st.nextToken().trim();
 			
-			if (aKey.equalsIgnoreCase("username"))
-				this.username = aValue;
-			else if (aKey.equalsIgnoreCase("endpoint"))
+			if (aKey.equalsIgnoreCase("username")) {
+			} else if (aKey.equalsIgnoreCase("endpoint"))
 				this.addr = aValue;
 			else if (aKey.equalsIgnoreCase("port"))
 				this.port = Integer.parseInt(aValue);
 			else if (aKey.equalsIgnoreCase("template")){
 				this.template = aValue;
 			}
+			else if (aKey.equalsIgnoreCase("ipmiParas")){
+				this.ipmiParas = aValue;
+			}
 			
 		}
 		ArrayList<String> dateR = socketToproxy("date -R");
 		//if(dateR.get(0).split(regex))
 		
-		int timeD = 0;
 		try {
-			if(dateR!=null&&!dateR.isEmpty())
-			timeD = Integer.parseInt(dateR.get(0).split(" ")[5].replaceAll("0", ""));
+			if(dateR!=null&&!dateR.isEmpty()) {
+			}
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		timediff = 0-timeD+9;
 		return true;
 	}
 
@@ -238,9 +237,11 @@ public class ProxyOpennebula implements CloudInterface {
 	@Override
 	public ArrayList<Vm> listVMs() {
 		// TODO Auto-generated method stub
-		String cmdLine="onevm list "+username;
+		String cmdLine="onevm list";
 		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
+		boolean flag = true;
+		while(flag){
 		if(feedBack!=null&&!feedBack.isEmpty()&&feedBack.get(0).contains("ID")){
 			for(int i = 1;i<feedBack.size();i++){
 				
@@ -274,18 +275,31 @@ public class ProxyOpennebula implements CloudInterface {
 
 				vmList.add(vm);				
 			}
+			flag = false;
+		}else if(feedBack.get(0).contains("ReadTimeout")){
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("ReadTimeout, waiting 5s... ...");
+			
 		}else{
 			System.out.println(feedBack.get(0));
+			flag = false;
 			return null;
 		}
-		
+		}
 		return vmList;
 	}
 
 	@Override
 	public ArrayList<Vm> destroyVM(String id) {
 		// TODO Auto-generated method stub
-		String cmdLine = "onevm delete "+id;
+		String vmid = id.split(":")[0].trim();
+		String ip = id.split(":")[1].trim();
+		String cmdLine = "./rmvm "+ip+" "+vmid;
 		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()){
@@ -337,11 +351,46 @@ public class ProxyOpennebula implements CloudInterface {
 
 
 
+	@Override
+	public boolean migrate(String vmid, String hostid) {
+		// TODO Auto-generated method stub
+		String cmdLine = "onevm migrate "+ vmid + " "+ hostid;
+		
+	    socketToproxy(cmdLine);
+		
+	    return true;
+	}
+
+	@Override
+	public boolean hoston(String ipmiID) {
+		// TODO Auto-generated method stub
+		String cmdLine = "ipmitool" + ipmiParas + " -H "+ipmiID+ " power on";
+		
+	    ArrayList<String> feedback = socketToproxy(cmdLine);
+	    if(feedback.get(0).equalsIgnoreCase("Chassis Power Control: Up/On")){
+	    	
+	    	return true;
+	    }else{
+	    	return false;
+	    }
+	}
+
+	@Override
+	public boolean hostoff(String ipmiID) {
+		// TODO Auto-generated method stub
+		String cmdLine = "ipmitool" + ipmiParas + " -H "+ipmiID+ " power off";
+		
+	    ArrayList<String> feedback = socketToproxy(cmdLine);
+	    if(feedback.get(0).equalsIgnoreCase("Chassis Power Control: Down/Off")){
+	    	return true;
+	    }
+		return false;
+	}
+
 	private String addr;
 	private int port;
-	private String username;
 	private String template;
-	private int timediff;
+	private String ipmiParas;
 
 
 }

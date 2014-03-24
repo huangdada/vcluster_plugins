@@ -409,5 +409,26 @@ public class Ec2gcloud implements CloudInterface{
 			e.printStackTrace();
 		}
 	}
+
+
+	@Override
+	public boolean hoston(String ipmiID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean hostoff(String ipmiID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean migrate(String vmid, String hostid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }

@@ -6,19 +6,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -463,26 +456,6 @@ public class CheckCondor {
 		
 		return doc;
 	}
-	private static void saveResponse(Document doc) throws Exception
-	{		
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		//initialize StreamResult with File object to save to file
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(doc);
-		transformer.transform(source, result);
-		String xmlString = result.getWriter().toString();
-
-        try {
-			FileWriter outFile = new FileWriter("HTCResponse.xml");
-			PrintWriter out = new PrintWriter(outFile);
-			out.println(xmlString);
-			outFile.close();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
-	}
-	
 	private void closeStream(BufferedReader in, DataOutputStream out, Socket socket)
 	{
 		try {

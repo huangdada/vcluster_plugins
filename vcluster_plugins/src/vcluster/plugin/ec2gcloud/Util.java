@@ -42,12 +42,12 @@ public class Util {
 		if (!st.hasMoreTokens()) return;
 		
 		/* get a keyword */
-		String aKey = st.nextToken().trim();
+		st.nextToken().trim();
 	
 		/* get a value */
 		if (!st.hasMoreTokens()) return;
 
-		String aValue = st.nextToken().trim();
+		st.nextToken().trim();
 
 	}
 	
