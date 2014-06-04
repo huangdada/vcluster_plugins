@@ -1,4 +1,4 @@
-package vcluster.plugin.econe;
+package vcluster.plugin.ec2;
 
 
 import java.security.InvalidKeyException;

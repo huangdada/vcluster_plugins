@@ -1,4 +1,4 @@
-package vcluster.plugin.proxy;
+package vcluster.plugin.proxy.opennebula;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import vcluster.control.vmman.Vm;
-import vcluster.global.Config.VMState;
-import vcluster.plugins.CloudInterface;
+import vcluster.elements.Vm;
+import vcluster.managers.VmManager.VMState;
+import vcluster.plugInterfaces.CloudInterface;
 
 public class ProxyOpennebula implements CloudInterface {
 	
@@ -164,7 +164,7 @@ public class ProxyOpennebula implements CloudInterface {
 				this.port = Integer.parseInt(aValue);
 			else if (aKey.equalsIgnoreCase("template")){
 				this.template = aValue;
-			}
+			}			
 			else if (aKey.equalsIgnoreCase("ipmiParas")){
 				this.ipmiParas = aValue;
 			}
@@ -231,7 +231,7 @@ public class ProxyOpennebula implements CloudInterface {
 				}
 			return true;
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -244,17 +244,16 @@ public class ProxyOpennebula implements CloudInterface {
 		while(flag){
 		if(feedBack!=null&&!feedBack.isEmpty()&&feedBack.get(0).contains("ID")){
 			for(int i = 1;i<feedBack.size();i++){
-				
+				//System.out.println(feedBack.get(i));
 				String [] vmEle = feedBack.get(i).split("\\s+");
-				if(vmEle.length<10){
+				if(vmEle.length<9){
 					continue;
 				}
 				Vm vm = new Vm();
 				try{
 					vm.setId(vmEle[0]);
 					//vm.setState(vmEle[4]);
-					getVminf(vm);
-					vm.setHostname(vmEle[7]);
+					getVminf(vm);					
 					if(vmEle[4].equalsIgnoreCase("runn")){
 						vm.setState(VMState.RUNNING);
 					}else if(vmEle[4].equalsIgnoreCase("stop")){
@@ -268,12 +267,16 @@ public class ProxyOpennebula implements CloudInterface {
 					}else{
 						vm.setState(VMState.NOT_DEFINED);
 					}
-				
+					if(vm.getState()==VMState.STOP){vm.setHostname("");}else{
+						vm.setHostname(vmEle[7]);
+					}
 				}catch(Exception e){
+					e.printStackTrace();
 					continue;
 				}
 
-				vmList.add(vm);				
+				vmList.add(vm);		
+				
 			}
 			flag = false;
 		}else if(feedBack.get(0).contains("ReadTimeout")){
@@ -291,25 +294,25 @@ public class ProxyOpennebula implements CloudInterface {
 			return null;
 		}
 		}
+		//System.out.println("opennebula plugin:"+vmList.size());
 		return vmList;
 	}
 
 	@Override
-	public ArrayList<Vm> destroyVM(String id) {
+	public ArrayList<Vm> destroyVM(Vm vm) {
 		// TODO Auto-generated method stub
-		String vmid = id.split(":")[0].trim();
-		String ip = id.split(":")[1].trim();
-		String cmdLine = "./rmvm "+ip+" "+vmid;
+			
+		String cmdLine = "./rmvm "+vm.getPrivateIP()+" "+vm.getId();
 		ArrayList<Vm> vmList = new ArrayList<Vm>();
 		ArrayList<String> feedBack = socketToproxy(cmdLine);
 		if(feedBack!=null&&!feedBack.isEmpty()){
 			System.out.println(feedBack.get(0));
 			return null;
 		}
-		Vm vm = new Vm();
-		vm.setId(id);
-		vm.setState(VMState.STOP);
-		vmList.add(vm);
+		Vm vm_1 = new Vm();
+		vm_1.setId(vm.getId());
+		vm_1.setState(VMState.STOP);
+		vmList.add(vm_1);
 		return vmList; 
 	}
 

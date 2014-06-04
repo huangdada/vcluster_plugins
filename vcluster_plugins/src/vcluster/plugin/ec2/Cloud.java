@@ -1,11 +1,10 @@
-package vcluster.plugin.ec2gcloud;
+package vcluster.plugin.ec2;
 
 import java.util.List;
 import java.util.StringTokenizer;
-
-import vcluster.global.Config.CloudType;
-import vcluster.plugin.ec2gcloud.PrintMsg.DMsgType;
-
+/**
+ *A class represents a cloud, the instance of this this class involves the information that register to a ec2 interface. 
+ */
 public class Cloud {
 	
 	protected Cloud() {
@@ -19,7 +18,9 @@ public class Cloud {
 		instanceType = null;
 		imageName = null;
 	}
-	
+	/**
+	 *Create a instance by a configuration list. 
+	 */
 	Cloud(List<String> configurations){
 		for(String aLine : configurations){
 			
@@ -113,7 +114,6 @@ public class Cloud {
 		else if (type.equalsIgnoreCase("public")) 
 			cloudType = CloudType.PUBLIC;
 		else {
-			PrintMsg.print(DMsgType.ERROR, "undefined type, "+type+", found");
 			cloudType = CloudType.NOT_DEFINED;
 		}
 		
@@ -211,7 +211,7 @@ public class Cloud {
 		
 	}
 
-	
+	public enum CloudType {PRIVATE, PUBLIC, NOT_DEFINED};
 	private CloudType cloudType;
 	private String endPoint;
 	private String shortEndPoint;

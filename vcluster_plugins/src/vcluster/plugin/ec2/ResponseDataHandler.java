@@ -1,4 +1,4 @@
-package vcluster.plugin.econe;
+package vcluster.plugin.ec2;
 
 import java.io.BufferedReader;
 import java.io.FileWriter;
@@ -20,8 +20,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import vcluster.control.vmman.Vm;
-import vcluster.global.Config.VMState;
+import vcluster.elements.Vm;
+import vcluster.managers.VmManager.VMState;
 
 public class ResponseDataHandler {
 	

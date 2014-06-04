@@ -1,4 +1,4 @@
-package vcluster.plugin.htcondor;
+package vcluster.plugin.proxy.opennebula.htcondor;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -17,11 +17,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import vcluster.control.batchsysman.PoolStatus;
-import vcluster.control.batchsysman.QStatus;
-import vcluster.control.batchsysman.Slot;
-import vcluster.control.cloudman.CloudManager;
-import vcluster.global.Config;
+import vcluster.Vcluster;
+import vcluster.elements.PoolStatus;
+import vcluster.elements.QStatus;
+import vcluster.elements.Slot;
+import vcluster.managers.CloudManager;
 
 public class CheckCondor {
 
@@ -44,8 +44,8 @@ public class CheckCondor {
 	
 	public CheckCondor() {
 		this.slots = new ArrayList<Slot> ();
-		this.addr = Config.CONDOR_IPADDR;
-		this.port = Config.PORTNUM;
+		this.addr = Vcluster.CONDOR_IPADDR;
+		this.port = Vcluster.PORTNUM;
 		//setQ();
 		//setPool();
 		//System.out.println("condor instance has generated!");
@@ -63,6 +63,16 @@ public class CheckCondor {
 		pool = new PoolStatus();
 		getSlots();
 		pool.setSlotList(slots);
+		int claimed=0;
+		int unclaimed=0;
+		int total = pool.getSlotList().size();
+		for(Slot s : pool.getSlotList()){
+			if(s.getActivity()==1)claimed++;
+		}
+		unclaimed = total - claimed;
+		pool.setTotalSlot(total);
+		pool.setUnClaimedSlot(unclaimed);
+		pool.setClaimedSlot(claimed);
 		return pool;
 	}
 

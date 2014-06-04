@@ -1,10 +1,10 @@
-package vcluster.plugin.htcondor;
+package vcluster.plugin.proxy.opennebula.htcondor;
 
 import java.io.File;
 
-import vcluster.control.batchsysman.PoolStatus;
-import vcluster.control.batchsysman.QStatus;
-import vcluster.plugins.BatchInterface;
+import vcluster.elements.PoolStatus;
+import vcluster.elements.QStatus;
+import vcluster.plugInterfaces.BatchInterface;
 
 public class ProxyHTCondor implements BatchInterface{
 

@@ -1,4 +1,4 @@
-package vcluster.plugin.ec2gcloud;
+package vcluster.plugin.ec2;
 
 import java.util.ArrayList;
 import java.util.List;
