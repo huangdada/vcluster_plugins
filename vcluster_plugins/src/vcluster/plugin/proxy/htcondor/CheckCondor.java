@@ -1,4 +1,4 @@
-package vcluster.plugin.proxy.opennebula.htcondor;
+package vcluster.plugin.proxy.htcondor;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
