@@ -21,8 +21,6 @@ import vcluster.util.Util;
 import com.sun.xml.bind.StringInputStream;
 
 
-
-
 public class Ec2 implements CloudInterface{
 
 	

@@ -3,7 +3,9 @@ package vcluster.plugin.ec2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
+/**
+ *This is a command enum for ec2 interface 
+ */
 public enum Command {
 
 
